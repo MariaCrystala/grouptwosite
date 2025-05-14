@@ -1,0 +1,41 @@
+{% extends "layout/base.html" %}
+
+{% block 'title' %}
+Genders List
+{% endblock 'title' %}
+
+{% block 'content' %}
+
+{% include "include/sidebar.html" %}
+{% include "include/ToastMessage.html" %}
+
+<div class="p-2 sm:ml-64 mt-16 md:mt-14">
+    <div class="relative overflow-x-auto">
+        <table class="bg-gray-200 shadow-gray-200 w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 rounded-md">
+            <thead class="text-sm  text-white uppercase bg-gray-50 dark:bg-gray-700 ">
+                <tr>
+                    <th class="px-6 py-3">Gender</th>
+                    <th class="px-6 py-3">Action</th>
+                </tr>
+            </thead>
+            <tbody class="text-black pt-2">
+                {% for gender in genders %}
+                <tr class="hover:bg-gray-200 border-b border-gray-100">
+                    <td class="px-6 py-3">{{ gender.gender }}</td>
+                    <td class="px-6 py-3">
+                        <div class="inline-flex shadow-sm">
+                            <a href="/gender/edit/{{ gender.gender_id }}" class="bg-blue-600 px-3 py-2.5 font-medium text-sm text-white hover:bg-blue-700 rounded-s-sm hover:outline-none">Edit</a>
+                            <a href="/gender/delete/{{ gender.gender_id }}" class="bg-red-500 px-3 py-2.5 font-medium text-sm text-white hover:bg-red-600 rounded-e-sm hover:outline-none">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+{% endblock 'content' %}
+
