@@ -9,7 +9,13 @@ Users List
 {% include "include/sidebar.html" %}
 {% include "include/ToastMessage.html" %}
 
-<div class="p-2 sm:ml-64 mt-16 md:mt-14">
+<form method="get" action="/user/list" class="p-2 sm:ml-64 mt-16 md:mt-14">
+    <input type="text" id="search-input" name="search" value="{{ search_query }}" 
+        placeholder="Search users..." class="border border-gray-300 rounded-md p-2">
+    <button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded">Search</button>
+</form>
+
+<div class="p-2 sm:ml-64">
     <div class="relative overflow-x-auto">
         <table class="bg-gray-200 shadow-gray-200 w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400 rounded-md">
             <thead class="text-sm  text-white uppercase bg-gray-50 dark:bg-gray-700 ">
@@ -24,7 +30,7 @@ Users List
                 </tr>
             </thead>
             <tbody class="text-black pt-2">
-                {% for user in users %}
+                {% for user in page_obj %}
                 <tr class="hover:bg-gray-200 border-b border-gray-100">
                     <td class="px-6 py-3">{{ user.full_name }}</td>
                     <td class="px-6 py-3">{{ user.gender.gender }}</td>
@@ -42,9 +48,44 @@ Users List
                 {% endfor %}
             </tbody>
         </table>
+        <div id="pagination-controls" class="pagination flex justify-center">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}" class="px-3 py-2 bg-gray-200 rounded">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}" class="px-3 py-2 bg-gray-200 rounded">Next</a>
+        {% endif %}
+    </div>
     </div>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("search-input");
+
+        searchInput.addEventListener("keyup", function () {
+            const query = searchInput.value;
+            const url = "/user/list?search=" + encodeURIComponent(query);
+
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+
+                    // Update table body
+                    document.querySelector("table tbody").innerHTML = doc.querySelector("table tbody").innerHTML;
+
+                    // Update pagination controls
+                    document.getElementById("pagination-controls").innerHTML = doc.getElementById("pagination-controls").innerHTML;
+                })
+                .catch(error => console.error("Search error:", error));
+        });
+    });
+</script>
 
 
 {% endblock 'content' %}

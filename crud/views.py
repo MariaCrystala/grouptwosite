@@ -4,10 +4,15 @@ from django.contrib import messages
 from .models import Genders, Users
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
 
+@login_required(login_url='/login/')
 def gender_list(request):
     try:
         genders = Genders.objects.all()
@@ -19,7 +24,8 @@ def gender_list(request):
         return render(request, 'gender/GendersList.html', data)
     except Exception as e:
         return HttpResponse(f'Error occured during load genders: {e}')
-    
+
+@login_required(login_url='/login/')
 def add_gender(request):
     try:
         if request.method == 'POST':
@@ -32,7 +38,8 @@ def add_gender(request):
             return render(request, 'gender/AddGender.html')
     except Exception as e:
         return HttpResponse(f'Error occured during add gender: {e}')
-    
+
+@login_required(login_url='/login/')
 def edit_gender(request, genderId):
     try:
         if request.method == 'POST':
@@ -60,7 +67,8 @@ def edit_gender(request, genderId):
             return render(request, 'gender/EditGender.html', data)
     except Exception as e:
         return HttpResponse(f'Error occured during edit gender: {e}')
-    
+
+@login_required(login_url='/login/')
 def delete_gender(request, genderId):
     try:
         if request.method == 'POST':
@@ -79,19 +87,32 @@ def delete_gender(request, genderId):
             return render(request, 'gender/DeleteGender.html', data)
     except Exception as e:
         return HttpResponse(f'Error occured during delete gender: {e}')
-    
+
+@login_required(login_url='/login/')
 def user_list(request):
     try:
-        usersObj = Users.objects.select_related('gender')
+        search_query = request.GET.get('search', '')
 
-        data = {
-            'users':usersObj
-        }
+        # Start with all users, filter if search is entered
+        users = Users.objects.select_related('gender')
 
-        return render(request, 'user/UsersList.html', data)
+        if search_query:
+            users = users.filter(
+                Q(full_name__icontains=search_query) |
+                Q(username__icontains=search_query) |
+                Q(email__icontains=search_query)         # Search by email
+            )
+
+
+        paginator = Paginator(users, 10)
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, 'user/UsersList.html', {'page_obj': page_obj, 'search_query': search_query})
     except Exception as e:
-        return HttpResponse(f'Error occured during load users: {e}')
-    
+        return HttpResponse(f'Error occurred during load users: {e}')
+
+@login_required(login_url='/login/')
 def add_user(request):
     try:
         if request.method == 'POST':
@@ -203,6 +224,7 @@ def add_user(request):
     except Exception as e:
         return HttpResponse(f'Error occured during add user: {e}')     
 
+@login_required(login_url='/login/')
 def user_edit(request, userId):
     try:
         userObj = Users.objects.get(pk=userId)
@@ -248,6 +270,7 @@ def user_edit(request, userId):
     except Exception as e:
         return HttpResponse(f'Error occurred during edit user: {e}')
 
+@login_required(login_url='/login/')
 def user_delete(request, userId):
     try:
         if request.method == 'POST':
@@ -266,3 +289,26 @@ def user_delete(request, userId):
             return render(request, 'user/DeleteUser.html', data)
     except Exception as e:
         return HttpResponse(f"Error occurred during user deletion: {e}")
+    
+    
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            messages.success(request, "Login successful!")
+            return redirect('/user/list') 
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    return render(request, 'user/login.html')
+
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect('login')
+
