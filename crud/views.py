@@ -9,10 +9,9 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-
 # Create your views here.
 
-@login_required(login_url='/login/')
+@login_required
 def gender_list(request):
     try:
         genders = Genders.objects.all()
@@ -25,7 +24,7 @@ def gender_list(request):
     except Exception as e:
         return HttpResponse(f'Error occured during load genders: {e}')
 
-@login_required(login_url='/login/')
+@login_required
 def add_gender(request):
     try:
         if request.method == 'POST':
@@ -39,7 +38,7 @@ def add_gender(request):
     except Exception as e:
         return HttpResponse(f'Error occured during add gender: {e}')
 
-@login_required(login_url='/login/')
+@login_required
 def edit_gender(request, genderId):
     try:
         if request.method == 'POST':
@@ -68,7 +67,7 @@ def edit_gender(request, genderId):
     except Exception as e:
         return HttpResponse(f'Error occured during edit gender: {e}')
 
-@login_required(login_url='/login/')
+@login_required
 def delete_gender(request, genderId):
     try:
         if request.method == 'POST':
@@ -88,9 +87,10 @@ def delete_gender(request, genderId):
     except Exception as e:
         return HttpResponse(f'Error occured during delete gender: {e}')
 
-@login_required(login_url='/login/')
+@login_required
 def user_list(request):
     try:
+        print("Logged in user:", request.user)
         search_query = request.GET.get('search', '')
 
         # Start with all users, filter if search is entered
@@ -112,7 +112,7 @@ def user_list(request):
     except Exception as e:
         return HttpResponse(f'Error occurred during load users: {e}')
 
-@login_required(login_url='/login/')
+@login_required
 def add_user(request):
     try:
         if request.method == 'POST':
@@ -224,7 +224,7 @@ def add_user(request):
     except Exception as e:
         return HttpResponse(f'Error occured during add user: {e}')     
 
-@login_required(login_url='/login/')
+@login_required
 def user_edit(request, userId):
     try:
         userObj = Users.objects.get(pk=userId)
@@ -270,7 +270,7 @@ def user_edit(request, userId):
     except Exception as e:
         return HttpResponse(f'Error occurred during edit user: {e}')
 
-@login_required(login_url='/login/')
+@login_required
 def user_delete(request, userId):
     try:
         if request.method == 'POST':
@@ -290,17 +290,18 @@ def user_delete(request, userId):
     except Exception as e:
         return HttpResponse(f"Error occurred during user deletion: {e}")
     
-    
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
 
-        if user is not None:
+        if user:
             login(request, user)
             messages.success(request, "Login successful!")
-            return redirect('/user/list') 
+
+            next_url = request.GET.get('next')
+            return redirect(next_url if next_url else '/user/list')
         else:
             messages.error(request, "Invalid username or password.")
 
@@ -312,3 +313,8 @@ def logout_view(request):
     messages.success(request, "You have been logged out.")
     return redirect('login')
 
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('user_list')  # or dashboard
+    else:
+        return redirect('login')

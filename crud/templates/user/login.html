@@ -18,6 +18,7 @@
 
         <form method="POST" action="{% url 'login' %}"class="space-y-4">
             {% csrf_token %}
+            {{ form.as_p}}
 
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700">Username</label>

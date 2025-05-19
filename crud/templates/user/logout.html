@@ -1,0 +1,22 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Logout{% endblock %}
+
+{% block content %} 
+
+    {% include "include/sidebar.html" %}
+    {% include "include/ToastMessage.html" %}
+
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
+            <h2 class="text-2xl font-bold text-gray-800">You have been logged out</h2>
+            <p class="text-gray-600 mt-2">Thanks for visiting! Hope to see you again soon.</p>
+
+             <div class="mt-4 space-x-4">
+                <a href="{% url 'login' %}" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">Log in again</a>
+        </div>
+    </div>
+
+
+{% endblock %}
+

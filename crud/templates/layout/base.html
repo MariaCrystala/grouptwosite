@@ -8,7 +8,19 @@
     <title>{% block 'title' %} {% endblock 'title' %}</title>
 </head>
 <body>
-    {% block 'content' %} {% endblock 'content' %}
+    
+    <div>
+        {% block 'content' %}{% endblock 'content' %}
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+
+    
     <script src="{% static 'js/auto_hide_toast.js' %}"></script>
 </body>
 </html>
