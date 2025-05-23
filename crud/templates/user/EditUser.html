@@ -7,11 +7,11 @@
 {% include "include/sidebar.html" %}
 {% include "include/ToastMessage.html" %}
 
-<div class="p-2 sm:ml-64 mt-16 md:mt-14">
+<div class="p-2 sm:ml-64 mt-10 md:mt-10">
     <div class="relative overflow-x-auto bg-gray-100 shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <form method="POST" action="/user/edit/{{user.user_id}}">
+        <form method="POST" action="/user/edit/{{user.user_id}}/">
             {% csrf_token %}
-            <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <div class="mb-5">
                 <div>
                     <label for="full_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-shadow-black">Full Name</label>
                     <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="full_name" id="full_name" value="{{user.full_name}}" />
@@ -45,11 +45,18 @@
                     <label for="contact_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Contact Number</label>
                     <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="contact_number" id="contact_number" value="{{ user.contact_number }}" />
                 </div>
+
+                
                
             </div>
-            
-            <a href="/user/list" class=" bg-white text-sm font-medium text-black px-3 py-2.5 rounded-sm shadow-sm mr-1 cursor-pointer hover:bg-gray-100 hover:outline-none ">Back</a>
-            <button type="submit" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save User</button>
+            <div class="flex justify-center">
+                <a href="/user/list" class=" bg-white text-sm font-medium text-black px-3 py-2.5 rounded-sm shadow-sm mr-1 cursor-pointer hover:bg-gray-100 hover:outline-none ">Back</a>
+                <button type="submit" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save User</button>
+            </div>
+
+            <div mt-4>
+                <a href="/user/change_password/{{ user.user_id }}/">Change Password</a>
+            </div>
         </form>
         
     </div>

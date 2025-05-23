@@ -1,13 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
 from .models import Genders, Users
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from datetime import datetime
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import SetPasswordForm
+
 
 # Create your views here.
 
@@ -228,7 +230,7 @@ def add_user(request):
 def user_edit(request, userId):
     try:
         userObj = Users.objects.get(pk=userId)
-        genders = Genders.objects.all()  # Get all available genders
+        genders = Genders.objects.all()
 
         if request.method == 'POST':
             username = request.POST.get('username')
@@ -238,37 +240,37 @@ def user_edit(request, userId):
             address = request.POST.get('address')
             contact_number = request.POST.get('contact_number')
 
-            userObj.address = address
-            userObj.contact_number = contact_number
+            # Check username uniqueness except for the current user
+            if Users.objects.filter(username=username).exclude(pk=userId).exists():
+                messages.error(request, 'Username already exists. Please choose another one.')
+                data = {
+                    'user': userObj,
+                    'genders': genders,
+                    'selected_gender_id': gender_id,
+                }
+                return render(request, 'user/EditUser.html', data)
+
             userObj.username = username
-            userObj.gender_id = gender_id  # Assign the selected gender
+            userObj.gender_id = gender_id
             userObj.birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
             userObj.email = email if email else None
+            userObj.address = address
+            userObj.contact_number = contact_number
             userObj.save()
 
             messages.success(request, 'User updated successfully!')
-
-            form_data={
-                'username' : username
-            }
-
-            if Users.objects.filter(username=username).exists():
-                messages.error(request, 'Username already exists. Please choose another one.')
-                return render(request, 'user/AddUser.html', {
-                    'genders': Genders.objects.all(),
-                    'form_data': form_data
-                })
+            return redirect('/user/list')  # or wherever you want to go after success
 
         data = {
             'user': userObj,
             'genders': genders,
-            'selected_gender_id': userObj.gender_id,  # For preselection
+            'selected_gender_id': userObj.gender_id,
         }
-
         return render(request, 'user/EditUser.html', data)
 
     except Exception as e:
         return HttpResponse(f'Error occurred during edit user: {e}')
+
 
 @login_required
 def user_delete(request, userId):
@@ -291,30 +293,54 @@ def user_delete(request, userId):
         return HttpResponse(f"Error occurred during user deletion: {e}")
     
 def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
+    try:
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(request, username=username, password=password)
 
-        if user:
-            login(request, user)
-            messages.success(request, "Login successful!")
+            if user:
+                login(request, user)
+                messages.success(request, "Login successful!")
 
-            next_url = request.GET.get('next')
-            return redirect(next_url if next_url else '/user/list')
-        else:
-            messages.error(request, "Invalid username or password.")
+                next_url = request.GET.get('next')
+                return redirect(next_url if next_url else '/user/list')
+            else:
+                messages.error(request, "Invalid username or password.")
 
-    return render(request, 'user/login.html')
+        return render(request, 'user/login.html')
+    except Exception as e:
+        return HttpResponse(f'Error occurred during login: {e}')
 
 
 def logout_view(request):
-    logout(request)
-    messages.success(request, "You have been logged out.")
-    return redirect('login')
+    try:
+        logout(request)
+        messages.success(request, "You have been logged out.")
+        return redirect('login')
+    except Exception as e:
+        return HttpResponse(f'Error occurred during logout: {e}')
 
 def home(request):
     if request.user.is_authenticated:
-        return redirect('user_list')  # or dashboard
+        return redirect('user_list/')  # or dashboard
     else:
         return redirect('login')
+
+def change_password(request, user_id):
+    userObj = get_object_or_404(Users, pk=user_id)
+
+    if request.method == 'POST':
+        form = SetPasswordForm(userObj, request.POST)
+        if form.is_valid():
+            userObj.save()
+            messages.success(request, 'Password changed successfully!')
+            return redirect('/user/list/')
+    else:
+        form = SetPasswordForm(userObj)
+
+    context = {
+        'user': userObj,
+        'form': form,
+    }
+    return render(request, 'user/ChangePassword.html', context)

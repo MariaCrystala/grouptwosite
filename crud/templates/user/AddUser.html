@@ -7,32 +7,45 @@
 {% include "include/sidebar.html" %}
 {% include "include/ToastMessage.html" %}
 
-<div class="p-2 sm:ml-64 mt-16 md:mt-14">
+<div class="p-2 sm:ml-64 mt-10 md:mt-10">
     <div class="relative overflow-x-auto bg-gray-100 shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <form method="POST" action="/user/add">
+        <form method="POST" action="/user/add/">
             {% csrf_token %}
-            <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <div class="mb-5">
                 <div>
                     <label for="full_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-shadow-black">Full Name</label>
                     <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="full_name" id="full_name" value="{{ form_data.full_name|default:'' }}" />
                 </div>
-                <div>
-                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Email</label>
-                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="email" id="email" value="{{ form_data.email|default:'' }}" />
-                </div>
+                
                 <div>
                     <label for="gender" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Gender</label>
                     <select name="gender" id="gender" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg mb-2 px-2 py-2.5 w-full focus:outline-none focus:ring-blue-500 dark:focus:border-blue-500">
                         <option value="">Select Gender</option>
                         {% for gender in genders %}
-                            <option value="{{ gender.gender_id }}">{{gender.gender}}</option>
-                        {% endfor %}
+                            <option value="{{ gender.gender_id }}"{% if form_data.gender == gender.gender_id|stringformat:"s" %} selected {% endif %} >{{gender.gender}}</option>
+                        {% endfor %}-
                     </select>
                 </div>  
                 <div>
                     <label for="birth_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Birth Date</label>
                     <input type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="birth_date" id="birth_date" value="{{ form_data.birth_date|default:'' }}" />
+                </div> 
+
+                <div>
+                    <label for="contact_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Contact Number</label>
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="contact_number" id="contact_number" value="{{ form_data.contact_number|default:'' }}" />
                 </div>
+
+                <div>
+                    <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Address</label>
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="address" id="address" value="{{ form_data.address|default:'' }}" />
+                </div>
+
+                <div>
+                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Email</label>
+                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="email" id="email" value="{{ form_data.email|default:'' }}" />
+                </div>
+
                 <div>
                     <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Username</label>
                     <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="username" id="username" value="{{ form_data.username|default:'' }}" />
@@ -41,28 +54,20 @@
                     <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Password</label>
                     <input type="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="password" id="password" />
                 </div>
-                <div>
-                    <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Address</label>
-                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="address" id="address" value="{{ form_data.address|default:'' }}" />
-                </div>
+                
                 <div>
                     <label for="confirm_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Confirm Password</label>
                     <input type="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="confirm_password" id="confirm_password" />
                 </div>
 
-                <div>
-                    <label for="contact_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Contact Number</label>
-                    <input type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="contact_number" id="contact_number" value="{{ form_data.contact_number|default:'' }}" />
-                </div>
+               
                
             </div>
             
-            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save User</button>
+            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 flex items-center justify-center mt-6 ">Save User</button>
         </form>
         
     </div>
 </div>
-
-
 
 {% endblock 'content' %}
