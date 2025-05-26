@@ -307,10 +307,10 @@ def login_view(request):
                 return redirect(next_url if next_url else '/user/list')
             else:
                 messages.error(request, "Invalid username or password.")
-
-        return render(request, 'user/login.html')
+                return redirect('/login/error=1')
     except Exception as e:
-        return HttpResponse(f'Error occurred during login: {e}')
+       message.error(request, f'An erro occured: {str(e)}')
+       return redirect('/login/?error=1')
 
 
 def logout_view(request):
