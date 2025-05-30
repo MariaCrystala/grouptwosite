@@ -128,6 +128,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/user/list/'  # Redirect users after login
-LOGOUT_REDIRECT_URL = '/login/'  # Redirect users after logout
-LOGIN_URL = '/login/'  # Where unauthenticated users are sent
+LOGIN_REDIRECT_URL = '/user/list/'      # Redirect users after login (should be a path, not a name)
+LOGOUT_REDIRECT_URL = '/login/'         # Redirect users after logout (should be a path, not a name)
+LOGIN_URL = '/login/'                   # Where unauthenticated users are sent

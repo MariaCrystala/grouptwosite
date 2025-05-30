@@ -9,10 +9,8 @@
 </head>
 <body>
     
-    <div>
-        {% block 'content' %}{% endblock 'content' %}
-    </div>
-    
+    {% block 'content' %}{% endblock 'content' %}
     <script src="{% static 'js/auto_hide_toast.js' %}"></script>
+    <script src="{% static 'js/login_error.js' %}"></script>
 </body>
 </html>

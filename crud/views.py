@@ -13,6 +13,39 @@ from django.contrib.auth.forms import SetPasswordForm
 
 # Create your views here.
 
+def login_view(request):
+    try:
+        if request.user.is_authenticated:
+            messages.info(request, "You are already logged in.")
+            return redirect('/user/list')
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            user = authenticate(request, username=username, password=password)
+
+            if user:
+                login(request, user)
+                messages.success(request, "Login successful!")
+                next_url = request.GET.get('next')
+                return redirect(next_url if next_url else '/user/list')
+            else:
+                # Redirect to /login/?error=1 on failed login
+                return redirect('/login/?error=1')
+        return render(request, 'user/login.html')
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        return redirect('/login/?error=1')
+
+
+def logout_view(request):
+    try:
+        logout(request)
+        messages.success(request, "You have been logged out.")
+        return redirect('login')
+    except Exception as e:
+        return HttpResponse(f'Error occurred during logout: {e}')
+
+
 @login_required
 def gender_list(request):
     try:
@@ -292,34 +325,6 @@ def user_delete(request, userId):
     except Exception as e:
         return HttpResponse(f"Error occurred during user deletion: {e}")
     
-def login_view(request):
-    try:
-        if request.method == 'POST':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            user = authenticate(request, username=username, password=password)
-
-            if user:
-                login(request, user)
-                messages.success(request, "Login successful!")
-
-                next_url = request.GET.get('next')
-                return redirect(next_url if next_url else '/user/list')
-            else:
-                messages.error(request, "Invalid username or password.")
-                return redirect('/login/error=1')
-    except Exception as e:
-       message.error(request, f'An erro occured: {str(e)}')
-       return redirect('/login/?error=1')
-
-
-def logout_view(request):
-    try:
-        logout(request)
-        messages.success(request, "You have been logged out.")
-        return redirect('login')
-    except Exception as e:
-        return HttpResponse(f'Error occurred during logout: {e}')
 
 def home(request):
     if request.user.is_authenticated:
